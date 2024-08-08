@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import Highlight from "@tiptap/extension-highlight";
@@ -27,7 +27,6 @@ import TaskItem from "@tiptap/extension-task-item";
 import Link from "@tiptap/extension-link";
 import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
-import BubbleMenu from "@tiptap/extension-bubble-menu";
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 
@@ -497,6 +496,34 @@ export default function Editor() {
       <div style={{ marginBottom: "15px" }}>
         <MenuBar editor={editor} />
       </div>
+      {editor && <BubbleMenu editor={editor} tippyOptions={{ duration: 100 }}>
+        <div className="bubble-menu">
+          <button
+            onClick={() => editor.chain().focus().toggleBold().run()}
+            className={editor.isActive('bold') ? 'is-active' : ''}
+          >
+            Bold
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleItalic().run()}
+            className={editor.isActive('italic') ? 'is-active' : ''}
+          >
+            Italic
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleStrike().run()}
+            className={editor.isActive('strike') ? 'is-active' : ''}
+          >
+            Strike
+          </button>
+          <button
+            onClick={() => editor.chain().focus().setUnderline().run()}
+            className={editor.isActive("underline") ? "is-active" : ""}
+          >
+            underline
+          </button>
+        </div>
+      </BubbleMenu>}
       <div className="p-2 content-container">
         <EditorContent editor={editor} />
       </div>
