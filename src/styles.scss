@@ -1,14 +1,35 @@
 /* Basic editor styles */
+:root {
+  --white: #FFF;
+  --black: #2E2B29;
+  --black-contrast: #110F0E;
+  --gray-1: rgba(61, 37, 20, .05);
+  --gray-2: rgba(61, 37, 20, .08);
+  --gray-3: rgba(61, 37, 20, .12);
+  --gray-4: rgba(53, 38, 28, .3);
+  --gray-5: rgba(28, 25, 23, .6);
+  --green: #22C55E;
+  --purple: #6A00F5;
+  --purple-contrast: #5800CC;
+  --purple-light: rgba(88, 5, 255, .05);
+  --yellow-contrast: #FACC15;
+  --yellow: rgba(250, 204, 21, .4);
+  --yellow-light: #FFFAE5;
+  --red: #FF5C33;
+  --red-light: #FFEBE5;
+  --shadow: 0px 12px 33px 0px rgba(0, 0, 0, .06), 0px 3.618px 9.949px 0px rgba(0, 0, 0, .04);
+}
+
 .main-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  max-width: 600px;
+  max-width: 750px;
   margin: auto;
   border: #00000045 solid 1px;
 
-  div:nth-of-type(2) {
+  > div:nth-of-type(2) {
     width: 100%;
 
     div {
@@ -16,8 +37,66 @@
     }
   }
 
+  > .features-list {
+    div {
+      display: flex;
+      max-width: 100%;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+  }
+
+  .features-list {
+    height: 25vh;
+    max-height: 200px;
+    overflow-y: scroll;
+
+    button {
+      background: var(--gray-2);
+      border-radius: .5rem;
+      border: none;
+      color: var(--black);
+      font-family: inherit;
+      font-size: .875rem;
+      font-weight: 500;
+      line-height: 1.15;
+      margin: 4px;
+      padding: .375rem .625rem;
+      transition: all .2s cubic-bezier(.65,.05,.36,1);
+    }
+
+    .color-picker-button {
+      position: relative;
+      cursor: pointer;
+      border: 1px solid #000;
+      padding: 3px;
+
+      input {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .content-container {
+    overflow-y: scroll;
+    max-height: 60vh;
+  }
+
   .is-active {
-    background-color: rgb(158, 103, 158);
+    background-color: rgb(158, 103, 158) !important;
+  }
+
+  .table-features-container {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    max-width: 735px;
   }
 
   blockquote {

@@ -31,7 +31,7 @@ import BubbleMenu from "@tiptap/extension-bubble-menu";
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 
-const limit = 280;
+const limit = 2800;
 
 const MenuBar = ({ editor }) => {
   const [color, setColor] = useState("#ffffff");
@@ -56,6 +56,8 @@ const MenuBar = ({ editor }) => {
     setColor(color);
   };
   console.log("editor", editor);
+
+  console.log("Current color at cursor:", editor.getAttributes('textStyle'));
 
   const addImage = useCallback(() => {
     const url = window.prompt("URL");
@@ -90,9 +92,13 @@ const MenuBar = ({ editor }) => {
     return null;
   }
 
+  console.log("colorQuery", editor.getAttributes('textStyle'), editor.getAttributes('textStyle')?.color || '#000');
+  console.log("backgroundColorQuery", editor.getAttributes('highlight'), editor.getAttributes('highlight')?.color || "#fff");
+  console.log("isTableActive", editor.isActive('table'), editor.getAttributes('table'));
+
   return (
-    <>
-      <div>
+    <div className="features-list">
+      <div className="p-2">
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={editor.isActive("bold") ? "is-active" : ""}
@@ -112,14 +118,13 @@ const MenuBar = ({ editor }) => {
           underline
         </button>
         <button
-          className={
-            editor.isActive("textStyle", { color: color }) ? "is-active" : ""
-          }
+          className="color-picker-button"
+          style={{ backgroundColor: editor.getAttributes('textStyle')?.color || "#3d251414" }}
         >
           Text Color
           <input
             value={
-              editor.isActive("textStyle", { color: color }) ? color : "#000"
+              editor.getAttributes('textStyle')?.color || "#000"
             }
             ref={colorPickerRef}
             type="color"
@@ -127,23 +132,26 @@ const MenuBar = ({ editor }) => {
           />
         </button>
         <button
-          onClick={() => editor.chain().focus().toggleHighlight().run()}
-          className={editor.isActive("highlight") ? "is-active" : ""}
+          className="color-picker-button"
+          style={{
+            backgroundColor: editor.getAttributes('highlight')?.color || "#FFFFFF"
+          }}
+          title="Text Background"
         >
-          Toggle highlight
+          Text Background
           <input
             value={
-              editor.isActive("textStyle", { color: color }) ? color : "#000"
+              editor.getAttributes('highlight')?.color || "#FFFFFF"
             }
-            ref={colorPickerRef}
             type="color"
-            onSelect={(e) =>
+            onChange={(e) => {
+              console.log("highlight color", e.target.value);
               editor
                 .chain()
                 .focus()
                 .toggleHighlight({ color: e.target.value })
                 .run()
-            }
+            }}
           />
         </button>
         <button
@@ -294,130 +302,110 @@ const MenuBar = ({ editor }) => {
           Unset link
         </button>
       </div>
+      <hr/>
       <div>
         {(editor.isActive("bulletList") || editor.isActive("orderedList")) && (
-          <>
-            <button
-              onClick={() =>
-                editor.chain().focus().splitListItem("listItem").run()
-              }
-              disabled={!editor.can().splitListItem("listItem")}
-            >
-              Split list item
-            </button>
-            <button
-              onClick={() =>
-                editor.chain().focus().sinkListItem("listItem").run()
-              }
-              disabled={!editor.can().sinkListItem("listItem")}
-            >
-              Sink list item
-            </button>
-            <button
-              onClick={() =>
-                editor.chain().focus().liftListItem("listItem").run()
-              }
-              disabled={!editor.can().liftListItem("listItem")}
-            >
-              Lift list item
-            </button>
-          </>
+          <div className="d-flex flex-column w-100">
+            <div>
+              <button
+                onClick={() =>
+                  editor.chain().focus().splitListItem("listItem").run()
+                }
+                disabled={!editor.can().splitListItem("listItem")}
+              >
+                Split list item
+              </button>
+              <button
+                onClick={() =>
+                  editor.chain().focus().sinkListItem("listItem").run()
+                }
+                disabled={!editor.can().sinkListItem("listItem")}
+              >
+                Sink list item
+              </button>
+              <button
+                onClick={() =>
+                  editor.chain().focus().liftListItem("listItem").run()
+                }
+                disabled={!editor.can().liftListItem("listItem")}
+              >
+                Lift list item
+              </button>
+            </div>
+            <hr className="w-100"/>
+          </div>
         )}
-        <div>
-          <button
-            onClick={() => editor.chain().focus().addColumnBefore().run()}
-          >
-            Add column before
-          </button>
-          <button onClick={() => editor.chain().focus().addColumnAfter().run()}>
-            Add column after
-          </button>
-          <button onClick={() => editor.chain().focus().deleteColumn().run()}>
-            Delete column
-          </button>
-          <button onClick={() => editor.chain().focus().addRowBefore().run()}>
-            Add row before
-          </button>
-          <button onClick={() => editor.chain().focus().addRowAfter().run()}>
-            Add row after
-          </button>
-          <button onClick={() => editor.chain().focus().deleteRow().run()}>
-            Delete row
-          </button>
-          <button onClick={() => editor.chain().focus().deleteTable().run()}>
-            Delete table
-          </button>
-          <button onClick={() => editor.chain().focus().mergeCells().run()}>
-            Merge cells
-          </button>
-          <button onClick={() => editor.chain().focus().splitCell().run()}>
-            Split cell
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleHeaderColumn().run()}
-          >
-            Toggle header column
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleHeaderRow().run()}
-          >
-            Toggle header row
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleHeaderCell().run()}
-          >
-            Toggle header cell
-          </button>
-          <button onClick={() => editor.chain().focus().mergeOrSplit().run()}>
-            Merge or split
-          </button>
-          <button
-            onClick={() =>
-              editor.chain().focus().setCellAttribute("colspan", 2).run()
-            }
-          >
-            Set cell attribute
-          </button>
-          <button onClick={() => editor.chain().focus().fixTables().run()}>
-            Fix tables
-          </button>
-          <button onClick={() => editor.chain().focus().goToNextCell().run()}>
-            Go to next cell
-          </button>
-          <button
-            onClick={() => editor.chain().focus().goToPreviousCell().run()}
-          >
-            Go to previous cell
-          </button>
-        </div>
-        <div>
-          <button
-            onClick={() =>
-              editor.chain().focus().splitListItem("taskItem").run()
-            }
-            disabled={!editor.can().splitListItem("taskItem")}
-          >
-            Split list item
-          </button>
-          <button
-            onClick={() =>
-              editor.chain().focus().sinkListItem("taskItem").run()
-            }
-            disabled={!editor.can().sinkListItem("taskItem")}
-          >
-            Sink list item
-          </button>
-          <button
-            onClick={() =>
-              editor.chain().focus().liftListItem("taskItem").run()
-            }
-            disabled={!editor.can().liftListItem("taskItem")}
-          >
-            Lift list item
-          </button>
-        </div>
+        {editor.isActive('table') && (
+          <div className="table-features-container">
+            <button
+              onClick={() => editor.chain().focus().addColumnBefore().run()}
+            >
+              Add column before
+            </button>
+            <button onClick={() => editor.chain().focus().addColumnAfter().run()}>
+              Add column after
+            </button>
+            <button onClick={() => editor.chain().focus().deleteColumn().run()}>
+              Delete column
+            </button>
+            <button onClick={() => editor.chain().focus().addRowBefore().run()}>
+              Add row before
+            </button>
+            <button onClick={() => editor.chain().focus().addRowAfter().run()}>
+              Add row after
+            </button>
+            <button onClick={() => editor.chain().focus().deleteRow().run()}>
+              Delete row
+            </button>
+            <button onClick={() => editor.chain().focus().deleteTable().run()}>
+              Delete table
+            </button>
+            <button onClick={() => editor.chain().focus().mergeCells().run()}>
+              Merge cells
+            </button>
+            <button onClick={() => editor.chain().focus().splitCell().run()}>
+              Split cell
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleHeaderColumn().run()}
+            >
+              Toggle header column
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleHeaderRow().run()}
+            >
+              Toggle header row
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleHeaderCell().run()}
+            >
+              Toggle header cell
+            </button>
+            <button onClick={() => editor.chain().focus().mergeOrSplit().run()}>
+              Merge or split
+            </button>
+            <button
+              onClick={() =>
+                editor.chain().focus().setCellAttribute("colspan", 2).run()
+              }
+            >
+              Set cell attribute
+            </button>
+            <button onClick={() => editor.chain().focus().fixTables().run()}>
+              Fix tables
+            </button>
+            <button onClick={() => editor.chain().focus().goToNextCell().run()}>
+              Go to next cell
+            </button>
+            <button
+              onClick={() => editor.chain().focus().goToPreviousCell().run()}
+            >
+              Go to previous cell
+            </button>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 
@@ -429,7 +417,7 @@ export default function Editor() {
       TextAlign.configure({
         types: ["heading", "paragraph"],
       }),
-      Highlight,
+      Highlight.configure({ multicolor: true }),
       Underline,
       Text,
       TextStyle,
@@ -474,16 +462,29 @@ export default function Editor() {
       }),
     ],
     content: `
-        <h3 style="text-align:center">
-          Devs Just Want to Have Fun by Cyndi Lauper
-        </h3>
-        <p style="text-align:center">
-          I come home in the morning light<br>
-          My mother says, <mark>“When you gonna live your life right?”</mark><br>
-          Oh mother dear we’re not the fortunate ones<br>
-          And devs, they wanna have fun<br>
-          Oh devs just want to have fun</p>
-        <span>Text Color</span>
+      <h1 style="text-align: center"><strong><u>Understanding Hypertension</u></strong></h1>
+      <p><strong>Hypertension</strong>, or <em>high blood pressure</em>, is a condition where the force of the blood against the artery walls is consistently too high. This can lead to significant health issues such as <strong>heart disease</strong>, <strong>stroke</strong>, and <strong>kidney damage</strong>.</p>
+      <hr contenteditable="false">
+      <p><strong>Symptoms:</strong></p>
+      <ol><li><p><strong>Lifestyle Changes:</strong></p><img src="https://t3.ftcdn.net/jpg/01/21/79/06/360_F_121790612_FN9IodcNfQfO6jcOP6YgKc1YbIOo7JXC.jpg" contenteditable="false" draggable="true" class="ProseMirror-selectednode"><ul><li><p>Adopting a healthy diet</p></li><li><p>Engaging in regular exercise</p></li></ul></li><li><p><strong>Medication:</strong></p><ul><li><p>Prescribed by a healthcare provider</p></li></ul></li></ol>
+      <hr contenteditable="false">
+      <blockquote><p><strong><em>"Managing hypertension is crucial for maintaining overall health and preventing serious complications."</em></strong></p></blockquote>
+      <hr contenteditable="false">
+      <p><strong>Important Notes:</strong></p>
+      <ul><li><p><strong>Subscript Example:</strong> Glucose levels can be measured as <em>mg/dL</em>.</p></li><li><p><strong>Superscript Example:</strong> The standard reference is <em>120/80 mmHg</em>.</p></li></ul>
+      <hr contenteditable="false">
+      <p><strong>Comparison Table:</strong></p>
+      <div class="tableWrapper"><table style="min-width: 75px;"><colgroup><col><col><col></colgroup><tbody><tr><th colspan="1" rowspan="1"><p>Measurement</p></th><th colspan="1" rowspan="1"><p>Normal</p></th><th colspan="1" rowspan="1"><p>Hypertension</p></th></tr><tr><td colspan="1" rowspan="1"><p><strong>Systolic</strong></p></td><td colspan="1" rowspan="1"><p>&lt;120</p></td><td colspan="1" rowspan="1"><p>≥140</p></td></tr><tr><td colspan="1" rowspan="1"><p><strong>Diastolic</strong></p></td><td colspan="1" rowspan="1"><p>&lt;80</p></td><td colspan="1" rowspan="1"><p>≥90</p></td></tr></tbody></table></div>
+      <hr contenteditable="false">
+      <p><strong>Further Reading:</strong></p>
+      <ul><li><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://www.heart.org/-/media/Files/Health-Topics/Answers-by-Heart/What-Is-High-Blood-Pressure.pdf">American Heart Association - Hypertension Overview</a></p></li><li><p class=""><a target="_blank" rel="noopener noreferrer nofollow" href="https://www.mayoclinic.org/diseases-conditions/high-blood-pressure/symptoms-causes/syc-20373410">Mayo Clinic - Hypertension</a></p></li></ul>
+      <hr contenteditable="false">
+      <p><strong>Check Your Health:</strong></p>
+      <ul data-type="taskList"><li data-checked="false"><label contenteditable="false"><input type="checkbox"><span></span></label><div><p>Regular Blood Pressure Checks</p></div></li><li data-checked="false"><label contenteditable="false"><input type="checkbox"><span></span></label><div><p>Healthy Eating</p></div></li><li data-checked="false"><label contenteditable="false"><input type="checkbox"><span></span></label><div><p>Regular Exercise</p></div></li></ul>
+      <hr contenteditable="false">
+      <p><strong>Contact Your Doctor:</strong></p>
+      <p>For more information and personalized advice, consult with your healthcare provider.</p>
+      <p>N(t)=N<sub>0</sub>​⋅e<sup>(r⋅t)</sup></p>
       `,
   });
 
@@ -496,8 +497,9 @@ export default function Editor() {
       <div style={{ marginBottom: "15px" }}>
         <MenuBar editor={editor} />
       </div>
-      <hr style={{ width: "100%" }} />
-      <EditorContent editor={editor} />
+      <div className="p-2 content-container">
+        <EditorContent editor={editor} />
+      </div>
       <div
         className={`character-count ${
           editor.storage.characterCount.characters() === limit
